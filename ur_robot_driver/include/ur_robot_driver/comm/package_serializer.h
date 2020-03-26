@@ -28,7 +28,7 @@
 #ifndef UR_RTDE_DRIVER_PACKAGE_SERIALIZER_H_INCLUDED
 #define UR_RTDE_DRIVER_PACKAGE_SERIALIZER_H_INCLUDED
 
-#include <endian.h>
+#include <ur_robot_driver/portable_endian.h>
 #include <cstring>
 
 namespace ur_driver

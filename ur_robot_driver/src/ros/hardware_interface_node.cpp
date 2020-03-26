@@ -56,6 +56,7 @@ int main(int argc, char** argv)
   // register signal SIGINT and signal handler
   signal(SIGINT, signalHandler);
 
+#ifndef WIN32
   std::ifstream realtime_file("/sys/kernel/realtime", std::ios::in);
   bool has_realtime;
   realtime_file >> has_realtime;
@@ -104,6 +105,7 @@ int main(int argc, char** argv)
       ROS_ERROR("Could not get maximum thread priority for main thread");
     }
   }
+#endif
 
   // Set up timers
   ros::Time timestamp;

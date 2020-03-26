@@ -294,8 +294,8 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
   speedsc_interface_.registerHandle(
       ur_controllers::SpeedScalingHandle("speed_scaling_factor", &speed_scaling_combined_));
 
-  fts_interface_.registerHandle(hardware_interface::ForceTorqueSensorHandle(
-      "wrench", tf_prefix_ + "tool0_controller", fts_measurements_.begin(), fts_measurements_.begin() + 3));
+  fts_interface_.registerHandle(hardware_interface::ForceTorqueSensorHandle(hardware_interface::ForceTorqueSensorHandle(
+      "wrench", tf_prefix_ + "tool0_controller", &fts_measurements_[0], &fts_measurements_[3])));
 
   // Register interfaces
   registerInterface(&js_interface_);
@@ -312,19 +312,19 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
   io_pub_->msg_.digital_out_states.resize(actual_dig_out_bits_.size());
   io_pub_->msg_.analog_in_states.resize(standard_analog_input_.size());
   io_pub_->msg_.analog_out_states.resize(standard_analog_output_.size());
-  for (size_t i = 0; i < actual_dig_in_bits_.size(); ++i)
+  for (UINT8 i = 0; i < actual_dig_in_bits_.size(); ++i)
   {
     io_pub_->msg_.digital_in_states[i].pin = i;
   }
-  for (size_t i = 0; i < actual_dig_out_bits_.size(); ++i)
+  for (UINT8 i = 0; i < actual_dig_out_bits_.size(); ++i)
   {
     io_pub_->msg_.digital_out_states[i].pin = i;
   }
-  for (size_t i = 0; i < standard_analog_input_.size(); ++i)
+  for (UINT8 i = 0; i < standard_analog_input_.size(); ++i)
   {
     io_pub_->msg_.analog_in_states[i].pin = i;
   }
-  for (size_t i = 0; i < standard_analog_output_.size(); ++i)
+  for (UINT8 i = 0; i < standard_analog_output_.size(); ++i)
   {
     io_pub_->msg_.analog_out_states[i].pin = i;
   }

@@ -20,10 +20,18 @@
  * limitations under the License.
  */
 
+#include <ur_robot_driver/portable_endian.h>
+#ifndef WIN32
 #include <arpa/inet.h>
-#include <endian.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
+#else
+#include <ws2tcpip.h>
+static int close(int fd)
+{
+  return closesocket(fd);
+}
+#endif
 #include <cstring>
 
 #include "ur_robot_driver/log.h"
@@ -44,13 +52,16 @@ TCPSocket::~TCPSocket()
 void TCPSocket::setOptions(int socket_fd)
 {
   int flag = 1;
-  setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
-  setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
+  setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&flag), sizeof(int));
 
+#ifndef WIN32
+  setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, reinterpret_cast<char*>(&flag), sizeof(int));
+  
   if (recv_timeout_ != nullptr)
   {
     setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, recv_timeout_.get(), sizeof(timeval));
   }
+#endif
 }
 
 bool TCPSocket::setup(std::string& host, int port)
@@ -68,7 +79,7 @@ bool TCPSocket::setup(std::string& host, int port)
   struct addrinfo hints, *result;
   std::memset(&hints, 0, sizeof(hints));
 
-  hints.ai_family = AF_UNSPEC;
+  hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE;
 
@@ -159,7 +170,7 @@ bool TCPSocket::read(uint8_t* buf, const size_t buf_len, size_t& read)
   if (state_ != SocketState::Connected)
     return false;
 
-  ssize_t res = ::recv(socket_fd_, buf, buf_len, 0);
+  auto res = ::recv(socket_fd_, reinterpret_cast<char*>(buf), static_cast<int>(buf_len), 0);
 
   if (res == 0)
   {
@@ -188,7 +199,7 @@ bool TCPSocket::write(const uint8_t* buf, const size_t buf_len, size_t& written)
   // handle partial sends
   while (written < buf_len)
   {
-    ssize_t sent = ::send(socket_fd_, buf + written, remaining, 0);
+    auto sent = ::send(socket_fd_, reinterpret_cast<const char*>(buf) + written, static_cast<int>(remaining), 0);
 
     if (sent <= 0)
     {

@@ -31,7 +31,7 @@
 
 #include <inttypes.h>
 #include <cstddef>
-#include <endian.h>
+#include <ur_robot_driver/portable_endian.h>
 #include "ur_robot_driver/types.h"
 
 namespace ur_driver
