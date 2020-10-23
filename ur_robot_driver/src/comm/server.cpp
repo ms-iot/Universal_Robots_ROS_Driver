@@ -13,7 +13,7 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in  writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -21,9 +21,14 @@
  */
 
 #include "ur_robot_driver/comm/server.h"
+#ifndef WIN32
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
+#else
+#include <ws2tcpip.h>
+typedef int socklen_t;
+#endif
 #include <cstring>
 #include "ur_robot_driver/log.h"
 
@@ -60,8 +65,8 @@ std::string URServer::getIP()
 bool URServer::open(int socket_fd, struct sockaddr* address, size_t address_len)
 {
   int flag = 1;
-  setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(int));
-  return ::bind(socket_fd, address, address_len) == 0;
+  setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&flag), sizeof(int));
+  return ::bind(socket_fd, address, static_cast<int>(address_len)) == 0;
 }
 
 bool URServer::bind()

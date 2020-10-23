@@ -344,6 +344,8 @@ private:
   void runProducer()
   {
     LOG_DEBUG("Starting up producer");
+
+#ifndef WIN32
     std::ifstream realtime_file("/sys/kernel/realtime", std::ios::in);
     bool has_realtime;
     realtime_file >> has_realtime;
@@ -396,6 +398,8 @@ private:
     {
       LOG_WARN("No realtime capabilities found. Consider using a realtime system for better performance");
     }
+  #endif
+  
     std::vector<std::unique_ptr<_package_type>> products;
     while (running_)
     {

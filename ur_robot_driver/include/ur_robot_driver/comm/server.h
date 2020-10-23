@@ -19,14 +19,14 @@
  */
 
 #pragma once
-#include <netdb.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <atomic>
 #include <cstdlib>
 #include <mutex>
 #include <string>
 #include "ur_robot_driver/comm/tcp_socket.h"
+
+struct sockaddr;
 
 namespace ur_driver
 {

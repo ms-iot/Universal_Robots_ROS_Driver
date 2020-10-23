@@ -56,20 +56,30 @@ catkin_package(
 )
 
 # check c++11 / c++0x
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-  add_compile_options(-std=c++11)
-elseif(COMPILER_SUPPORTS_CXX0X)
-  add_compile_options(-std=c++0x)
+if(NOT MSVC)
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+  if(COMPILER_SUPPORTS_CXX11)
+    add_compile_options(-std=c++11)
+  elseif(COMPILER_SUPPORTS_CXX0X)
+    add_compile_options(-std=c++0x)
+  else()
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler. Suggested solution: update the pkg build-essential ")
+  endif()
+
+  add_compile_options(-Wextra)
+  add_compile_options(-Wall)
+  add_compile_options(-Wno-unused-parameter)
 else()
-  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler. Suggested solution: update the pkg build-essential ")
+  if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+  endif()
+
+  add_compile_options(/W3 /WX /wd4068)
 endif()
 
-add_compile_options(-Wall)
-add_compile_options(-Wextra)
-add_compile_options(-Wno-unused-parameter)
+
 
 
 include_directories(
@@ -106,7 +116,10 @@ add_library(ur_robot_driver
     src/ur/tool_communication.cpp
     src/rtde/rtde_writer.cpp
 )
-target_link_libraries(ur_robot_driver ${catkin_LIBRARIES})
+target_link_libraries(ur_robot_driver
+    ${catkin_LIBRARIES}
+    Ws2_32.lib
+    )
 add_dependencies(ur_robot_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_library(ur_robot_driver_plugin

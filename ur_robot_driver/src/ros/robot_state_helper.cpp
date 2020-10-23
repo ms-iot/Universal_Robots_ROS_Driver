@@ -28,6 +28,7 @@
 #include <ur_robot_driver/ros/robot_state_helper.h>
 
 #include <std_srvs/Trigger.h>
+#include <thread>
 namespace ur_driver
 {
 RobotStateHelper::RobotStateHelper(const ros::NodeHandle& nh) : nh_(nh), set_mode_as_(nh_, "set_mode", false)
@@ -79,6 +80,7 @@ void RobotStateHelper::safetyModeCallback(const ur_dashboard_msgs::SafetyMode& m
 
 void RobotStateHelper::updateRobotState()
 {
+  using namespace std::chrono_literals;
   if (set_mode_as_.isActive())
   {
     // Update action feedback
@@ -103,7 +105,7 @@ void RobotStateHelper::updateRobotState()
       if (robot_mode_ == RobotMode::RUNNING && goal_->play_program)
       {
         // The dashboard denies playing immediately after switching the mode to RUNNING
-        sleep(1);
+        std::this_thread::sleep_for(1ms);
         safeDashboardTrigger(&this->play_program_srv_);
       }
 

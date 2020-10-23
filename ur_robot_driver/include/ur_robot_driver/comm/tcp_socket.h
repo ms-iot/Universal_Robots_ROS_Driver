@@ -19,18 +19,22 @@
  */
 
 #pragma once
-#include <netdb.h>
-#include <sys/socket.h>
+#ifdef WIN32
+#include <ws2tcpip.h>
+#endif
 #include <sys/types.h>
 #include <atomic>
 #include <mutex>
 #include <string>
 #include <memory>
 
+struct sockaddr;
+
 namespace ur_driver
 {
 namespace comm
 {
+
 /*!
  * \brief State the socket can be in
  */

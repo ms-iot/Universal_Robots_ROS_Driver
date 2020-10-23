@@ -80,7 +80,7 @@ public:
 protected:
   virtual bool open(int socket_fd, struct sockaddr* address, size_t address_len)
   {
-    return ::connect(socket_fd, address, address_len) == 0;
+    return ::connect(socket_fd, address, static_cast<int>(address_len)) == 0;
   }
 
 private:
