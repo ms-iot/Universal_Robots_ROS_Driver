@@ -33,8 +33,6 @@
 class ControllerStopper
 {
 public:
-//
-//
   ControllerStopper() = delete;
   ControllerStopper(const ros::NodeHandle& nh);
   virtual ~ControllerStopper() = default;
